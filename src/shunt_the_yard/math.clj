@@ -6,7 +6,7 @@
        (map first)
        set))
 
-(def operator->precedence
+(def precedence
   {\* 3
    \/ 3
    \+ 2
@@ -23,8 +23,8 @@
     (let [top (peek o)]
       (if (and top
                (not= \( top)
-               (> (get operator->precedence top)
-                  (get operator->precedence token)))
+               (> (precedence top)
+                  (precedence token)))
         (recur (conj q top)
                (pop o))
         [q (conj o token)]))))
