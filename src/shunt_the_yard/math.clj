@@ -15,6 +15,18 @@
 (def operator-token?
   #{\+ \- \* \/})
 
+(defn handle-token-functionally
+  "Not quite there yet."
+  [{:keys [token
+           output-queue
+           operator-stack]}]
+  (let [[departing remaining] (->> operator-stack
+                                   (split-with #(and (not= \( %)
+                                                     (> (precedence %)
+                                                        (precedence token)))))]
+    [(into (clojure.lang.PersistentQueue/EMPTY) (concat departing output-queue))
+     (conj remaining token)]))
+
 (defn handle-token [{:keys [token
                             output-queue
                             operator-stack]}]
@@ -56,31 +68,32 @@
          operator-stack '()]
     (if-not (seq tokens)
       (flush-stack output-queue operator-stack)
-      (let [t (first tokens)]
-        (cond (number-token? t)
-              (recur (rest tokens)
-                     (conj output-queue t)
-                     operator-stack)
+      (let [token (first tokens)]
+        (cond
+          (number-token? token)
+          (recur (rest tokens)
+                 (conj output-queue token)
+                 operator-stack)
 
-              (operator-token? t)
-              (let [[queue stack] (handle-token {:token          t
-                                                 :output-queue   output-queue
-                                                 :operator-stack operator-stack})]
-                (recur (rest tokens)
-                       queue
-                       stack))
+          (operator-token? token)
+          (let [[queue stack] (handle-token {:token          token
+                                             :output-queue   output-queue
+                                             :operator-stack operator-stack})]
+            (recur (rest tokens)
+                   queue
+                   stack))
 
-              (= \( t)
-              (recur (rest tokens)
-                     output-queue
-                     (conj operator-stack t))
+          (= \( token)
+          (recur (rest tokens)
+                 output-queue
+                 (conj operator-stack token))
 
-              (= \) t)
-              (let [[queue stack] (handle-right-parentheses output-queue
-                                                            operator-stack)]
-                (recur (rest tokens)
-                       queue
-                       stack)))))))
+          (= \) token)
+          (let [[queue stack] (handle-right-parentheses output-queue
+                                                        operator-stack)]
+            (recur (rest tokens)
+                   queue
+                   stack)))))))
 
 (defn tokenize [expression]
   (->> expression
@@ -104,12 +117,13 @@
   (loop [i coll]
     (if (= 1 (count i))
       (first i)
-      (let [op (first (drop-while integer? i))
-            nums ((juxt (comp last butlast) last) (take-while integer? i))
-            result (apply op nums)]
-        (recur (concat (drop-last 2 (take-while integer? i))
+      (let [[neck tail] (split-with integer? i)
+            op (first tail)
+            nums (take-last 2 neck)
+            result (int (apply op nums))]
+        (recur (concat (drop-last 2 neck)
                        [result]
-                       (drop 1 (drop-while integer? i))))))))
+                       (drop 1 tail)))))))
 
 (defn calculate [expression]
   (->> expression
