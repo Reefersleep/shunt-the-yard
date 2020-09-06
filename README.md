@@ -1,6 +1,7 @@
 ### Just for fun
 This is an exercise I did in understanding the [shunting-yard algorithm](https://en.wikipedia.org/wiki/Shunting-yard_algorithm) by implementing it in Clojure.
-I wouldn't use this implementation for serious calculations; it is _just_ an exercise, and it has very limited mathematical and numerical capabilities.
+I wouldn't use this implementation for serious calculations; it is _just_ an exercise, and it has very limited mathematical and numerical capabilities. 
+Furthermore, the code is not especially functional; I more or less followed [the imperative pseudocode example from the wikpedia article](https://en.wikipedia.org/wiki/Shunting-yard_algorithm#The_algorithm_in_detail).
 
 The tests in `shunt-the-yard.math-test` should show the current capabilities of the code.
 
