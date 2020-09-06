@@ -101,11 +101,11 @@
                         symbol
                         resolve))))))
 
-(defn calculate-reverse-polish [coll]
-  (loop [i coll]
-    (if (= 1 (count i))
-      (first i)
-      (let [[neck tail] (split-with integer? i)
+(defn calculate-reverse-polish [expression]
+  (loop [coll expression]
+    (if (= 1 (count coll))
+      (first coll)
+      (let [[neck tail] (split-with integer? coll)
             op (first tail)
             nums (take-last 2 neck)
             result (int (apply op nums))]
