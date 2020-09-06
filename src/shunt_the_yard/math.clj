@@ -15,18 +15,6 @@
 (def operator-token?
   #{\+ \- \* \/})
 
-(defn handle-token-functionally
-  "Not quite there yet."
-  [{:keys [token
-           output-queue
-           operator-stack]}]
-  (let [[departing remaining] (->> operator-stack
-                                   (split-with #(and (not= \( %)
-                                                     (> (precedence %)
-                                                        (precedence token)))))]
-    [(into (clojure.lang.PersistentQueue/EMPTY) (concat departing output-queue))
-     (conj remaining token)]))
-
 (defn handle-token [{:keys [token
                             output-queue
                             operator-stack]}]
